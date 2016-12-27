@@ -26,13 +26,13 @@ public:
 
     void warning();
 
-    void addroom(QString,QString);
-
     void removeroom();
 
     void enterroomok();
 
     void hidehall();
+
+    void flushroom(QVector<QVector<int>>);
 
     void showgame();//窗口出现
     void flush(QVector<QPair<int,int>>,int);//加入玩家:改为接受列表
@@ -48,9 +48,9 @@ public:
 
 signals:
 
-    void Newroom(const QPair<QString,int> pair);
+    void Newroom(const int number);
 
-    void enterRoom(const QString ip);
+    void enterRoom(const int id);
 
     void ready();//准备
     void cancel();//取消准备
@@ -65,9 +65,9 @@ private:
 
     void showcreateroom();
 
-    void onenewroom(const QPair<QString,int> pair);
+    void onenewroom(const int number);
 
-    void enterroom(const QString ip);
+    void enterroom(const int id);
 
     void openweb();
 

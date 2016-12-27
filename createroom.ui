@@ -29,42 +29,11 @@
     <string/>
    </property>
   </widget>
-  <widget class="QLineEdit" name="roomname">
-   <property name="geometry">
-    <rect>
-     <x>195</x>
-     <y>81</y>
-     <width>125</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(222, 222, 222);</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>91</x>
-     <y>81</y>
-     <width>104</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;
-color: rgb(222, 222, 222);
-background-color: rgba(10, 10, 40, 200);</string>
-   </property>
-   <property name="text">
-    <string>设置房间ID</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>91</x>
-     <y>150</y>
+     <x>90</x>
+     <y>100</y>
      <width>104</width>
      <height>31</height>
     </rect>
@@ -81,8 +50,8 @@ background-color: rgba(10, 10, 40, 200);</string>
   <widget class="QLineEdit" name="number">
    <property name="geometry">
     <rect>
-     <x>195</x>
-     <y>150</y>
+     <x>194</x>
+     <y>100</y>
      <width>125</width>
      <height>31</height>
     </rect>

@@ -31,7 +31,7 @@ signals:
 
     void createbutton_clicked();
 
-    void enterroom(const QString ip);
+    void enterroom(const int id);
 
     void openlogin();
 

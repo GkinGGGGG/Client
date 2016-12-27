@@ -17,11 +17,11 @@ public:
 
     ~createroom();
 
-    QPair<QString,int> getPair();
+//    int getnumber();
 
 signals:
 
-    void newroom(const QPair<QString,int> pair);
+    void newroom(const int number);
 
 private:
 
@@ -29,7 +29,7 @@ private:
 
     Ui::createroom *ui;
 
-    QPair<QString,int> pair;
+    int Number;
 };
 
 #endif // CREATEROOM_H

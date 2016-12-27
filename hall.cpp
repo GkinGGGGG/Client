@@ -114,7 +114,8 @@ void hall::getitem(QTableWidgetItem *item){
 
     int row=item->row();
     QString ip=ui->roomtableWidget->item(row,0)->text();
-    emit enterroom(ip);
+    int id = ip.toInt();
+    emit enterroom(id);
 }
 
 void hall::on_pushButton_clicked()
@@ -125,5 +126,6 @@ void hall::on_pushButton_clicked()
     }
     else{
     QString ip=ui->roomtableWidget->item(row-1,0)->text();
-    emit enterroom(ip);}
+    int id = ip.toInt();
+    emit enterroom(id);}
 }

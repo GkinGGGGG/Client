@@ -44,8 +44,8 @@ void gui::showcreateroom(){
     c.exec();
 }
 
-void gui::onenewroom(const QPair<QString, int> pair){
-    emit Newroom(pair);
+void gui::onenewroom(const int number){
+    emit Newroom(number);
     c.hide();
 }
 
@@ -54,16 +54,22 @@ void gui::warning(){
     warning.exec();
 }
 
-void gui::addroom(QString a, QString b){
-    w.addroom(a,b);
+void gui::flushroom(QVector<QVector<int> > vect){
+    removeroom();
+    int i=vect.size();
+    for(int j=0;j<i;j++){
+        QString a=QString::number(vect[j][0],10);
+        QString b=QString::number(vect[j][2],10)+"/"+QString::number(vect[j][1],10)+"人";
+        w.addroom(a,b);
+    }
 }
 
 void gui::removeroom(){
     w.removeall();
 }
 
-void gui::enterroom(const QString ip){
-    emit enterRoom(ip);
+void gui::enterroom(const int id){
+    emit enterRoom(id);
 }
 
 void gui::enterroomok(){
@@ -118,7 +124,6 @@ void gui::gunprepared()
 void gui::ggoback()
 {
     emit quit();
-    w.show();
 }
 
 void gui::role(int role)
