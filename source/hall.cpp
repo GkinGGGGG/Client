@@ -101,7 +101,7 @@ void hall::closehall(){
     i=1;
     QTimer *timer = new QTimer;
     this->connect(timer,SIGNAL(timeout()),this,SLOT(timerDone()));
-    this->connect(this,&hall::stoptimer,timer,&timer->stop);
+    this->connect(this,&hall::stoptimer,timer,&QTimer::stop);
     timer->start(10);
 }
 

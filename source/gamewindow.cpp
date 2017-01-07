@@ -10,6 +10,11 @@
 #include<QEvent>
 #include<QKeyEvent>
 #include"warning.h"
+#include<QFileDialog>
+#include<QDragEnterEvent>
+#include<QFile>
+#include<QTextStream>
+#include<QMimeData>
 GameWindow::GameWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::GameWindow)
@@ -85,7 +90,7 @@ GameWindow::GameWindow(QWidget *parent) :
     connect(ui->pushButton_23,&QPushButton::clicked,this,&GameWindow::chooseyes);
     connect(ui->pushButton_24,&QPushButton::clicked,this,&GameWindow::chooseno);
     connect(ui->pushButton_20,&QPushButton::clicked,this,&GameWindow::exploded);
-    connect(ui->pushButton_14,&QPushButton::clicked,ui->textEdit_2,&QTextEdit::clear);
+    connect(ui->pushButton_14,&QPushButton::clicked,this,&GameWindow::on_actionJilu_triggered);
     connect(ui->pushButton_22,&QPushButton::clicked,this,&GameWindow::setcolor);
     connect(ui->pushButton_21,&QPushButton::clicked,this,&GameWindow::searchfor);
     connect(&s,&search::findfor,this,&GameWindow::show_text);
@@ -98,6 +103,9 @@ GameWindow::GameWindow(QWidget *parent) :
     connect(ui->pushButton_19,SIGNAL(clicked()),mapper,SLOT(map()));
     mapper->setMapping(ui->pushButton_19,0);
     connect(mapper,SIGNAL(mapped(int)),this,SLOT(choice(int)));
+    color0=QColor( 0, 85, 255);
+    ui->textEdit->setAcceptDrops(false);
+    setAcceptDrops(true);
     /*QPalette editpalette=ui->textEdit_2->palette();
     editpalette.setColor(QPalette::HighlightedText,Qt::yellow);
     editpalette.setColor(QPalette::HighlightedText,Qt::white);
@@ -280,10 +288,13 @@ void GameWindow::start(int role)
 
 void GameWindow::getmessage(int seat,QString str)
 {
-    if(seat!=-1)
-    ui->textEdit_2->append(tr("%1号玩家：").arg(seat+1));
-    ui->textEdit_2->append(str);
 
+    if(seat!=-1)
+        ui->textEdit_2->append(tr("%1号玩家：").arg(seat+1));
+    else
+        ui->textEdit_2->setTextColor(color0);
+    ui->textEdit_2->append(str);
+    ui->textEdit_2->setTextColor(color);
 }
 
 void GameWindow::myturn()
@@ -291,7 +302,9 @@ void GameWindow::myturn()
     ui->textEdit->setEnabled(true);
     ui->pushButton->setEnabled(true);
     ui->pushButton_17->setEnabled(true);
+    ui->textEdit_2->setTextColor(color0);
     ui->textEdit_2->append(tr("轮到你了："));
+    ui->textEdit_2->setTextColor(color0);
 }
 
 void GameWindow::endturn()
@@ -370,6 +383,10 @@ void GameWindow::gameover()
     ui->pushButton->setEnabled(false);
     ui->pushButton_17->setEnabled(false);
     ui->textEdit->setEnabled(false);
+    ui->pushButton_20->setVisible(false);
+    ui->pushButton_14->setVisible(false);
+    if(e.isRunning())
+        e.exit(0);
 }
 void GameWindow::on_textEdit_textChanged()
 {
@@ -388,4 +405,79 @@ void GameWindow::on_continue_2_clicked()
 {
     bgm->play();
     ui->stop->setVisible(true);
+}
+
+void GameWindow::on_pushButton_16_clicked()
+{
+    QString fileName=QFileDialog::getSaveFileName(this,tr("Save File"),".",tr("文本文件(*txt)"));
+        if(fileName.isEmpty())
+        {
+            QMessageBox::information(this,tr("错误信息"),("请输入文件名！"));
+            return;
+        }
+        QFile *file=new QFile;
+        file->setFileName(fileName+".txt");
+        bool ok=file->open(QIODevice::WriteOnly);
+        if(ok)
+        {
+            QTextStream out(file);
+            out<<ui->textEdit_2->toPlainText();
+            file->close();
+            delete file;
+        }
+        else
+        {
+            QMessageBox::information(this,"Error Messaage","File Save Error"+file->errorString());
+            return;
+        }
+}
+
+void GameWindow::on_actionJilu_triggered()
+{
+
+
+    QString path = QFileDialog::getOpenFileName(this,tr("查看记录"),".","Text Files(*.txt)");
+            if(!path.isEmpty()) {
+                QFile file(path);
+                if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                    QMessageBox::warning(this, tr("Read File"),tr("不能打开文件:\n%1").arg(path));
+                    return;
+                }
+                QTextStream in(&file);
+                    ui->textEdit_2->setTextColor(Qt::yellow);
+                    ui->textEdit_2->append(in.readAll());
+                    ui->textEdit_2->setTextColor(color);
+
+                file.close();
+            } else {
+                QMessageBox::warning(this, tr("路径"),tr("未选取文件！"));
+            }
+
+}
+
+void GameWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+    else event->ignore();
+}
+
+void GameWindow::dropEvent(QDropEvent *event)
+{
+    const QMimeData *mimedata=event->mimeData();
+    if(mimedata->hasUrls())
+    {
+        QList<QUrl> urlList=mimedata->urls();
+        QString fileName=urlList.at(0).toLocalFile();
+        if(! fileName.isEmpty())
+        {
+            QFile file(fileName);
+            if(! file.open(QIODevice::ReadOnly)) return;
+
+            QTextStream in(&file);
+            ui->textEdit_2->setTextColor(Qt::yellow);
+            ui->textEdit_2->append(in.readAll());
+            ui->textEdit_2->setTextColor(color0);
+        }
+    }
 }

@@ -60,6 +60,7 @@ public:
 
     void gameover();//游戏结束
 
+    void dead();//死亡
 
 signals:
 

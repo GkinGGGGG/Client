@@ -14,7 +14,7 @@ Core::Core(QObject *parent) : QObject(parent)
 }
 void Core::connectToServer(){
     QPair<QString,int> server=G.acquireServer();
-    if(server.second==0){
+    if(server.second<=0){
         QApplication::exit();
     }
     else{
@@ -28,12 +28,11 @@ void Core::connectToServer(){
         connect(socket,&TcpSock::destroyed,thread,&QThread::quit);
         connect(thread,&QThread::finished,thread,&QThread::deleteLater);
         connect(thread,&QThread::destroyed,this,&Core::onNetworkError);
-        sendEmptyMessage(0,2,0,0);
 
     }
 }
 void Core::sendEmptyMessage(int t, int st, int rt, int ri){
-    Message *msg=new Message(t,st,rt,ri,2,id);
+    Message *msg=new Message(t,st,rt,ri,1,id);
     QCoreApplication::postEvent(socket,msg);
 }
 void Core::onNetworkError(){
@@ -76,11 +75,16 @@ void Core::handleMessage(Message msg){
         case 12:
             G.myturn();
             break;
+        case 17:
+            G.dead();
+            break;
         case 19:
             if(msg.getArgument().isEmpty())
                 return;
             if(msg.getArgument()[0])
                 G.endturn();
+            else
+                G.showmessage(-1,"Self-explode failed!");
             break;
         default:
             genFeedback(msg);
@@ -108,6 +112,7 @@ void Core::handleMessage(Message msg){
                 G.back(true);
                 pos=HALL;
                 G.showHall();
+                sendEmptyMessage(0,2,0,0);
             }
             else
                 G.warning();
@@ -132,15 +137,12 @@ void Core::handleMessage(Message msg){
     }
 }
 void Core::genFeedback(Message msg){
-    qDebug()<<"Generating feedback...";
-    if(msg.getArgument().isEmpty())
-        return;
     int st=msg.getSubtype();
     bool allowGiveup=false;
     if(st==7||st==8||st==14||st==18)
         allowGiveup=true;
     Message *feedback=new Message(1,msg.getSubtype(),2,roomid,1,id);
-    if(st==5||st==11){
+    if(st==11){
         feedback->addArgument(G.choose());
     }
     else if(st==15){
@@ -152,7 +154,6 @@ void Core::genFeedback(Message msg){
         feedback->addArgument(ret);
     }
     QCoreApplication::postEvent(socket,feedback);
-    qDebug()<<"Generated.";
 }
 void Core::Newroom(const int number){
     Message *msg=new Message(0,1,0,0,1,id);
@@ -188,7 +189,6 @@ void Core::explode(){
     sendEmptyMessage(1,19,2,roomid);
 }
 void Core::flushPlayer(QVector<int> player){
-    qDebug()<<"flushing player...";
     int cap=player[0],num=player[1],ready=player[2];
     QVector<QPair<int,int> >players;
     for(int i=0;i<num;i++){
@@ -199,11 +199,9 @@ void Core::flushPlayer(QVector<int> player){
         if(tmp.second==id)
             G.myplayer(tmp.first,tmp.second);
     }
-    qDebug()<<"players:"<<players.size();
     G.flush(players,ready,cap);
 }
 void Core::flushRoom(QVector<int> rooms){
-    qDebug()<<"flushing room...";
     int num=rooms[0];
     QVector<QVector<int>> roominfo;
     for(int i=0;i<num;i++){

@@ -178,3 +178,7 @@ void gui::explodepermitted(bool p)
 {
     g.explodepermitted(p);
 }
+void gui::dead()
+{
+    g.gameover();
+}
